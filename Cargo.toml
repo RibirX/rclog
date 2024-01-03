@@ -1,0 +1,24 @@
+[package]
+name = "rclog"
+version = "0.1.0"
+edition = "2021"
+license-file = "./LICENSE"
+description = "a tool that makes your development process easier. It combines changelogs from different pre-release versions and pulls out information for a specific version."
+homepage = "https://github.com/RibirX/rclog"
+repository = "https://github.com/RibirX/rclog"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.4.12", features = ["derive"] }
+comrak = {version = "0.20", default-features = false}
+semver = "1.0.20"
+
+[package.metadata.release]
+pre-release-replacements = [
+  {file="CHANGELOG.md", search="@Unreleased", replace="{{version}}", prerelease = true},
+  {file="CHANGELOG.md", search="\\.\\.\\.HEAD", replace="...{{tag_name}}", min=0, prerelease = true},
+  {file="CHANGELOG.md", search="@ReleaseDate", replace="{{date}}", prerelease = true},
+  {file="CHANGELOG.md", search="<!-- next-header -->", replace="<!-- next-header -->\n\n## [@Unreleased] - @ReleaseDate", exactly=1, prerelease = true},
+  {file="CHANGELOG.md", search="<!-- next-url -->", replace="<!-- next-url -->\n[@Unreleased]: https://github.com/RibirX/rclog/compare/{{tag_name}}...HEAD", exactly=1, prerelease = true},
+]

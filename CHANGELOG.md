@@ -1,0 +1,33 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+Please keep one empty line before and after all headers. (This is required for `git` to produce a conflict when a release is made while a PR is open and the PR's changelog entry would go into the wrong section).
+
+There are 5 types of changes:
+
+- `Features` for new features.
+- `Changed` for changes in existing functionality.
+- `Fixed` for any bug fixes.
+- `Breaking` for the detail of any backward incompatible changes.
+
+Please only add new entries below the [Unreleased](#unreleased---releasedate) header with the following format:
+
+```md
+-  description of change (#PR @contributor)
+```
+
+<!-- next-header -->
+
+## @Unreleased - @ReleaseDate
+
+## Features
+
+The initial version of the changelog management tool of [Ribir](ribir.org). Run ``rclog -h`` to see the usage.
+  
+- support extract changelog from a specific version: `rclog -t 0.1.0 -p ./CHANGELOG.md extract`
+- support merge changelog from multi pre-release version to the more stable version: `rclog -t 0.1.0 -p ./CHANGELOG.md merge`
+  
+<!-- next-url -->
+
+
