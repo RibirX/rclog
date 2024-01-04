@@ -1,6 +1,6 @@
 # Ribir Changelog
 
-Ribir Changelog is a tool that makes your development process easier. It combines changelogs from different pre-release versions and pulls out information for a specific version.
+Ribir Changelog is a tool that combines changelogs of pre-release versions into the more stable version and pulls out information for a specific version.
 
 This tool helps with two main tasks for [Ribir](ribir.org) changelog management:
 
@@ -9,7 +9,13 @@ This tool helps with two main tasks for [Ribir](ribir.org) changelog management:
 
 ## Important
 
-This tool works with changelogs in markdown format. It expects each version to be a second-level header. If you're using the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format for your changelog, this tool will work perfectly.
+This tool works with changelogs in markdown format. It expects each version to be a second-level heading. If you're using the [keepachangelog](https://keepachangelog.com/en/1.0.0/) format for your changelog, this tool will work perfectly.
+
+## Installation
+
+```sh
+cargo install rclog
+```
 
 ## How to Use
 
@@ -26,3 +32,28 @@ rclog -t 0.1.0 -p ./CHANGELOG.md merge
 ```
 
 Run `rclog --help` for more information.
+
+## Use in GitHub Action
+
+This project also provides a reusable GitHub workflow to help Rust project in Github to release version. See 
+[release-version.yml](./github/workflows/release-version.yml) to see how it works.
+
+To publish a new version to crates.io you need to set your publish secret token of `crates.io` in your repository. This action will use `${{ secrets.CRATE_RELEASE_TOKEN }}` to access the token.
+
+This workflow is based on [cargo-release](https://github.com/crate-ci/cargo-release) and `rclog`. 
+
+If you want to merge changelogs from all pre-release versions into the release version, you need to configure `pre-release-hook` for `cargo-release` in your project's `Cargo.toml` or `release.toml` with this content:
+
+```toml
+pre-release-hook = ["./rclog_hook.sh"]
+```
+
+And the `rclog_hook.sh` should be like this:
+
+```sh
+#!/bin/bash
+
+if $MERGE_CHANGELOG; then
+  echo "$(rclog -t $NEW_VERSION -p ./CHANGELOG.md merge)" >| ./CHANGELOG.md
+fi
+```

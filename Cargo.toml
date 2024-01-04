@@ -3,7 +3,7 @@ name = "rclog"
 version = "0.1.1-alpha.1"
 edition = "2021"
 license-file = "./LICENSE"
-description = "a tool that makes your development process easier. It combines changelogs from different pre-release versions and pulls out information for a specific version."
+description = "A tool that combines changelogs of pre-release versions into the more stable version and pulls out information for a specific version."
 homepage = "https://github.com/RibirX/rclog"
 repository = "https://github.com/RibirX/rclog"
 
@@ -22,3 +22,4 @@ pre-release-replacements = [
   {file="CHANGELOG.md", search="<!-- next-header -->", replace="<!-- next-header -->\n\n## [@Unreleased] - @ReleaseDate", exactly=1, prerelease = true},
   {file="CHANGELOG.md", search="<!-- next-url -->", replace="<!-- next-url -->\n[@Unreleased]: https://github.com/RibirX/rclog/compare/{{tag_name}}...HEAD", exactly=1, prerelease = true},
 ]
+pre-release-hook = ["./rclog_hook.sh"]

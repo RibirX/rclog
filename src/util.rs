@@ -30,7 +30,7 @@ pub fn extract_content(version: &Version, changelog: &str) -> String {
     format_commonmark(node, &<_>::default(), &mut content).unwrap();
   }
 
-  return String::from_utf8(content).unwrap();
+  String::from_utf8(content).unwrap()
 }
 
 /// Merge the pre-release version changelog to the more stable version
@@ -43,7 +43,7 @@ pub fn merge_pre_release_changelogs(
   content: &str,
 ) -> Result<String, Box<dyn std::error::Error + 'static>> {
   let arena = Arena::new();
-  let doc = parse_document(&arena, &content, &Options::default());
+  let doc = parse_document(&arena, content, &Options::default());
 
   struct MergePart<'a> {
     title: String,
@@ -60,7 +60,7 @@ pub fn merge_pre_release_changelogs(
   for node in doc.children() {
     if let Some(v) = version_title(node) {
       // version title matched
-      if VersionReq::parse(&v.to_string())?.matches(&version) {
+      if VersionReq::parse(&v.to_string())?.matches(version) {
         in_version_heading = true;
         // only keep first version heading, other version headings will be removed
         if &v == version {
@@ -92,7 +92,7 @@ pub fn merge_pre_release_changelogs(
         format_commonmark(node, &options, &mut content)?;
         let title = String::from_utf8(content)?;
         merging_part_name = Some(title.clone());
-        if merge_parts.iter().find(|p| p.title == title).is_none() {
+        if !merge_parts.iter().any(|p| p.title == title) {
           merge_parts.push(MergePart { title, content: vec![] });
         }
         continue;
@@ -184,7 +184,7 @@ version 0.1.1
 [0.1.2]: ribir.org
 ";
   let v0_1_2 = Version::parse("0.1.2").unwrap();
-  let content = extract_content(&v0_1_2, &content);
+  let content = extract_content(&v0_1_2, content);
   assert_eq!(content, "### Features\n- version [0.1.2](ribir.org)\n");
 }
 
@@ -216,7 +216,7 @@ fn merge() {
 ";
 
   let version = Version::parse("0.1.0").unwrap();
-  let new_changelog = merge_pre_release_changelogs(&version, &changelog).unwrap();
+  let new_changelog = merge_pre_release_changelogs(&version, changelog).unwrap();
   assert_eq!(
     "# Changelog
 

@@ -1,25 +1,42 @@
-name: Cargo Build & Test
+name: CI
 
 on:
-  push:
+  merge_group:
   pull_request:
+  push:
+    branches:
+      - master
 
 env: 
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test:
+  format_and_clippy:
     name: Rust project - latest
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: format style check
+        run: cargo fmt --all -- --check
+      - name: cargo clippy check
+        run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: cargo check
+        run: cargo check
+  build_and_test:
+    needs: format_and_clippy
     strategy:
       matrix:
-        toolchain:
-          - stable
-          - beta
-          - nightly
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
-      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-      - run: cargo build --verbose
-      - run: cargo test --verbose
-  
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+      - run: cargo test --all-features
