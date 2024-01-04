@@ -1,0 +1,27 @@
+name: "version release"
+permissions:
+  contents: write
+on:
+  workflow_dispatch: # allows manual triggering
+    inputs:
+      level:
+        description: 'release version level'
+        required: true
+        default: 'alpha'
+        type: choice
+        options:
+        - alpha
+        - beta
+        - rc
+        - patch
+        - minor
+        - major
+jobs:
+  call-workflow-passing-data:
+    uses: M-Adoo/rclog/.github/workflows/release-version.yml@feat/release-workflow
+    with:
+      level: ${{ github.event.inputs.level }}
+      ref: ${{ github.ref }}
+      merge_changelog: ${{ github.event.inputs.level == 'patch'|| github.event.inputs.level == 'minor' || github.event.inputs.level == 'major' }}
+    secrets:
+      CRATE_RELEASE_TOKEN: ${{ secrets.CRATE_RELEASE_TOKEN }}

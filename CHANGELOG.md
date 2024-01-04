@@ -10,6 +10,7 @@ There are 5 types of changes:
 - `Changed` for changes in existing functionality.
 - `Fixed` for any bug fixes.
 - `Breaking` for the detail of any backward incompatible changes.
+- `Infrastructure`for all the tools and processes that support our development, such as CI/CD, testing frameworks, build tools, etc.
 
 Please only add new entries below the [Unreleased](#unreleased---releasedate) header with the following format:
 
@@ -20,6 +21,18 @@ Please only add new entries below the [Unreleased](#unreleased---releasedate) he
 <!-- next-header -->
 
 ## [@Unreleased] - @ReleaseDate
+
+## Infrastructure
+
+- Add github actions to manage rclog release(#1 @M-Adoo)
+
+## Features
+
+- Add a reusable workflow to help Rust project in Github to release version. (#1 @M-Adoo)
+  - Optionally, merge changelogs from all pre-release versions into the release version
+  - Publish a new version to crates.io.
+  - Extract the changelog of a specific version and create a new release note on GitHub.
+
 
 ## 0.1.1-alpha.1 - 2024-01-04
 

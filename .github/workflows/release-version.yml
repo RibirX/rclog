@@ -1,0 +1,97 @@
+on:
+  workflow_call:
+    inputs:
+      level:
+        description: 'The level of the release, see cargo-release doc for more info'
+        default: 'alpha'
+        required: true
+        type: string
+      merge_changelog:
+        description: 'Merge the changelog into the release body'
+        default: false
+        required: false
+        type: boolean
+      toolchain:
+        description: 'The rust toolchain use to release the project'
+        default: 'stable'
+        required: false
+        type: string
+      ref:
+        description: 'The ref to use to checkout the project'
+        default: '${{ github.ref }}'
+        required: false
+        type: string
+    secrets:
+      CRATE_RELEASE_TOKEN:
+        description: 'A token to publish the crate'
+        required: true
+      
+    
+
+permissions:
+  contents: write
+
+env: 
+  CARGO_TERM_COLOR: always
+  NEW_COMMIT_COUNT: 0
+  CHANGELOG: 'Waiting to be extracted'
+  TAG_NAME: 'Waiting to release'
+  PRERELEASE: ${{ inputs.level == 'alpha' || inputs.level == 'beta' || inputs.level == 'rc' }}
+
+name: "Release pre-relase or patch version"
+jobs:
+  release:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0 # Required to count the commits
+      - name: Get new commits
+        run: echo "NEW_COMMIT_COUNT=$(git log --oneline --since '1 week' | wc -l)" >> $GITHUB_ENV
+      - name: Install Rust
+        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ inputs.toolchain }}
+      - name: Install cargo-release
+        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-release
+      # fixme: remove when stable version is released
+      - name: Install alpha rclog
+        run: cargo install rclog --version "0.1.1-alpha.1"
+      - name: git config
+        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
+        run: |
+          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+          git config --global user.name "RChangelog[bot]"
+          git config --global user.email 155627257+RChangelog[bot]@users.noreply.github.com
+      # todo: use cargo-release directly merge the changelog 
+      # https://github.com/crate-ci/cargo-release/issues/741
+      - name: config merge changelog env
+        run: export MERGE_CHANGELOG=${{ inputs.merge_changelog }}
+      - name: cargo login
+        run: cargo login ${{ secrets.CRATE_RELEASE_TOKEN }}
+      - name: Run cargo release to publish
+        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
+        run: cargo release ${{inputs.level}} --execute --no-confirm
+      - name: Extract changelog
+        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
+        run: |
+          echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+          version=$(git describe --tags --abbrev=0 | grep -oP '(?<=v)\S*')
+          echo "VERSION=$version" >> $GITHUB_ENV
+          {
+            echo 'CHANGELOG<<delimiter-for-changelog' 
+            rclog -t ${version} -p ./CHANGELOG.md extract
+            echo 'delimiter-for-changelog'
+          } >> $GITHUB_ENV
+      - name: Github release notes
+        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
+        uses: ncipollo/release-action@v1
+        with:
+          prerelease: ${{ env.PRERELEASE }}
+          body: ${{ env.CHANGELOG }}
+          tag: ${{ env.TAG_NAME }}
