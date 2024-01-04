@@ -19,7 +19,9 @@ Please only add new entries below the [Unreleased](#unreleased---releasedate) he
 
 <!-- next-header -->
 
-## @Unreleased - @ReleaseDate
+## [@Unreleased] - @ReleaseDate
+
+## 0.1.1-alpha.1 - 2024-01-04
 
 ## Features
 
@@ -29,5 +31,6 @@ The initial version of the changelog management tool of [Ribir](ribir.org). Run 
 - support merge changelog from multi pre-release version to the more stable version: `rclog -t 0.1.0 -p ./CHANGELOG.md merge`
   
 <!-- next-url -->
+[@Unreleased]: https://github.com/RibirX/rclog/compare/v0.1.1-alpha.1...HEAD
 
 
