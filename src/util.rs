@@ -10,7 +10,10 @@ use comrak::{
 use semver::{Version, VersionReq};
 
 /// Pick the changelog content of the given version
-pub fn extract_content(version: &Version, changelog: &str) -> String {
+pub fn extract_content(
+  version: &Version,
+  changelog: &str,
+) -> Result<String, Box<dyn std::error::Error + 'static>> {
   let arena = Arena::new();
   let doc = parse_document(&arena, changelog, &Options::default());
 
@@ -26,11 +29,13 @@ pub fn extract_content(version: &Version, changelog: &str) -> String {
     ) {
       break;
     }
-
-    format_commonmark(node, &<_>::default(), &mut content).unwrap();
+    format_commonmark(node, &<_>::default(), &mut content)?;
   }
-
-  String::from_utf8(content).unwrap()
+  if content.is_empty() {
+    Err("No changelog content found".into())
+  } else {
+    Ok(String::from_utf8(content)?)
+  }
 }
 
 /// Merge the pre-release version changelog to the more stable version
@@ -134,8 +139,11 @@ pub fn merge_pre_release_changelogs(
 
   // pop the last '\n'
   content.pop();
-
-  Ok(String::from_utf8(content)?)
+  if content.is_empty() {
+    Err("No changelog content found".into())
+  } else {
+    Ok(String::from_utf8(content)?)
+  }
 }
 
 fn pick_version<'a>(node: &'a AstNode<'a>) -> Option<Version> {
@@ -184,7 +192,7 @@ version 0.1.1
 [0.1.2]: ribir.org
 ";
   let v0_1_2 = Version::parse("0.1.2").unwrap();
-  let content = extract_content(&v0_1_2, content);
+  let content = extract_content(&v0_1_2, content).unwrap();
   assert_eq!(content, "### Features\n- version [0.1.2](ribir.org)\n");
 }
 
