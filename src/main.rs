@@ -42,7 +42,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
   };
   match args.command {
     Commands::Extract => {
-      let content = extract_content(&version, &changelog);
+      let content = extract_content(&version, &changelog)?;
       println!("{}", content);
     }
     Commands::Merge => {

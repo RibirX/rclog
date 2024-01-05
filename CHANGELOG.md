@@ -22,21 +22,24 @@ Please only add new entries below the [Unreleased](#unreleased---releasedate) he
 
 ## [@Unreleased] - @ReleaseDate
 
-## Infrastructure
+### Infrastructure
 
 - Add github actions to manage rclog release(#1 @M-Adoo)
 
-## Features
+### Features
 
 - Add a reusable workflow to help Rust project in Github to release version. (#1 @M-Adoo)
   - Optionally, merge changelogs from all pre-release versions into the release version
   - Publish a new version to crates.io.
   - Extract the changelog of a specific version and create a new release note on GitHub.
 
+### Fixed
+
+- Return error when the changelog content is empty. (#1 @M-Adoo)
 
 ## 0.1.1-alpha.1 - 2024-01-04
 
-## Features
+### Features
 
 The initial version of the changelog management tool of [Ribir](ribir.org). Run ``rclog -h`` to see the usage.
   
