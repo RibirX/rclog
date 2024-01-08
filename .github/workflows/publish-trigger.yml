@@ -1,4 +1,4 @@
-name: "version release"
+name: "Pcublish trigger"
 permissions:
   contents: write
 on:
