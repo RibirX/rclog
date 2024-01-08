@@ -116,6 +116,10 @@ pub fn merge_pre_release_changelogs(
     }
   }
 
+  if version_idx == -1 {
+    return Err("No version heading found".into());
+  }
+
   let mut content = vec![];
 
   for (idx, node) in nodes.iter().enumerate() {
@@ -240,4 +244,22 @@ fn merge() {
 ",
     new_changelog,
   )
+}
+
+#[test]
+fn fix_merge_wrong_version() {
+  let changelog = "# Changelog
+
+  ## Unreleased 
+  
+  The version not released yet.
+  
+  ## 0.1.1-alpha.1 - 2024-01-02
+  
+  But a pre-release version is released.
+  ";
+
+  let version = Version::parse("0.1.1").unwrap();
+  let new_changelog = merge_pre_release_changelogs(&version, changelog);
+  assert!(new_changelog.is_err())
 }
