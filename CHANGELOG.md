@@ -36,6 +36,7 @@ Please only add new entries below the [Unreleased](#unreleased---releasedate) he
 ### Fixed
 
 - Return error when the changelog content is empty. (#1 @M-Adoo)
+- Fix merge a non-exist version may delete the pre-release version. (#1 @M-Adoo)
 
 ## 0.1.1-alpha.1 - 2024-01-04
 
