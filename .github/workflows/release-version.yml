@@ -38,7 +38,7 @@ env:
   TAG_NAME: 'Waiting to release'
   PRERELEASE: ${{ inputs.level == 'alpha' || inputs.level == 'beta' || inputs.level == 'rc' }}
 
-name: "Release pre-relase or patch version"
+name: "Publish new version"
 jobs:
   release:
     runs-on: ubuntu-22.04
