@@ -35,10 +35,12 @@ Run `rclog --help` for more information.
 
 ## Use in GitHub Action
 
-This project also provides a reusable GitHub workflow to help Rust project in Github to release version. See 
+This project also provides a reusable GitHub workflow to help the Rust project in Github to release the version. See 
 [release-version.yml](./github/workflows/release-version.yml) to see how it works.
 
 To publish a new version to crates.io you need to set your publish secret token of `crates.io` in your repository. This action will use `${{ secrets.CRATE_RELEASE_TOKEN }}` to access the token.
+
+To push the release commit and tag to your repository, you need to set your deploy key in your repository. This action will use `${{ secrets.DEPLOY_KEY }}` to access the key.
 
 This workflow is based on [cargo-release](https://github.com/crate-ci/cargo-release) and `rclog`. 
 
