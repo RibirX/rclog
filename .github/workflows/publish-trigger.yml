@@ -1,4 +1,4 @@
-name: "Pcublish trigger"
+name: "Publish trigger"
 permissions:
   contents: write
 on:
