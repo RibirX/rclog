@@ -25,8 +25,9 @@ on:
       CRATE_RELEASE_TOKEN:
         description: 'A token to publish the crate'
         required: true
-      
-    
+      DEPLOY_KEY:
+        description: 'A github deploy key to push release commit to the repo'
+        required: true
 
 permissions:
   contents: write
@@ -47,6 +48,7 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0 # Required to count the commits
+          ssh-key: ${{secrets.DEPLOY_KEY}}
       - name: Get new commits
         run: echo "NEW_COMMIT_COUNT=$(git log --oneline --since '1 week' | wc -l)" >> $GITHUB_ENV
       - name: Install Rust
@@ -54,18 +56,14 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ inputs.toolchain }}
-      - name: Install cargo-release
+      - name: Install cargo-release & rclog
         if: ${{ env.NEW_COMMIT_COUNT > 0 }}
         uses: taiki-e/install-action@v2
         with:
-          tool: cargo-release
-      # fixme: remove when stable version is released
-      - name: Install alpha rclog
-        run: cargo install rclog --version "0.1.1-alpha.1"
+          tool: cargo-release, rclog
       - name: git config
         if: ${{ env.NEW_COMMIT_COUNT > 0 }}
         run: |
-          git remote set-url origin https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
           git config --global user.name "RChangelog[bot]"
           git config --global user.email 155627257+RChangelog[bot]@users.noreply.github.com
       # todo: use cargo-release directly merge the changelog 

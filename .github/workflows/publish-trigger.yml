@@ -25,3 +25,4 @@ jobs:
       merge_changelog: ${{ github.event.inputs.level == 'patch'|| github.event.inputs.level == 'minor' || github.event.inputs.level == 'major' }}
     secrets:
       CRATE_RELEASE_TOKEN: ${{ secrets.CRATE_RELEASE_TOKEN }}
+      DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
