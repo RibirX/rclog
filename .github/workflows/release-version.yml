@@ -66,15 +66,15 @@ jobs:
         run: |
           git config --global user.name "RChangelog[bot]"
           git config --global user.email 155627257+RChangelog[bot]@users.noreply.github.com
-      # todo: use cargo-release directly merge the changelog 
-      # https://github.com/crate-ci/cargo-release/issues/741
-      - name: config merge changelog env
-        run: export MERGE_CHANGELOG=${{ inputs.merge_changelog }}
       - name: cargo login
         run: cargo login ${{ secrets.CRATE_RELEASE_TOKEN }}
       - name: Run cargo release to publish
         if: ${{ env.NEW_COMMIT_COUNT > 0 }}
-        run: cargo release ${{inputs.level}} --execute --no-confirm
+        run: |
+          # todo: use cargo-release directly merge the changelog 
+          # https://github.com/crate-ci/cargo-release/issues/741
+          export MERGE_CHANGELOG=${{ inputs.merge_changelog }}
+          cargo release ${{inputs.level}} --execute --no-confirm
       - name: Extract changelog
         if: ${{ env.NEW_COMMIT_COUNT > 0 }}
         run: |

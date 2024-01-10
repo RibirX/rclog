@@ -55,7 +55,7 @@ And the `rclog_hook.sh` should be like this:
 ```sh
 #!/bin/bash
 
-if $MERGE_CHANGELOG; then
+if [ "$MERGE_CHANGELOG" = true ]; then
   echo "$(rclog -t $NEW_VERSION -p ./CHANGELOG.md merge)" >| ./CHANGELOG.md
 fi
 ```
