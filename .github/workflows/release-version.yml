@@ -25,8 +25,8 @@ on:
       CRATE_RELEASE_TOKEN:
         description: 'A token to publish the crate'
         required: true
-      DEPLOY_KEY:
-        description: 'A github deploy key to push release commit to the repo'
+      GITHUB_RELEASE_TOKEN:
+        description: 'A github personal token to push release commit to the repo and create github release note'
         required: true
 
 permissions:
@@ -44,11 +44,11 @@ jobs:
   release:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0 # Required to count the commits
-          ssh-key: ${{secrets.DEPLOY_KEY}}
+          token: ${{ secrets.GITHUB_RELEASE_TOKEN }}
       - name: Get new commits
         run: echo "NEW_COMMIT_COUNT=$(git log --oneline --since '1 week' | wc -l)" >> $GITHUB_ENV
       - name: Install Rust
@@ -93,3 +93,4 @@ jobs:
           prerelease: ${{ env.PRERELEASE }}
           body: ${{ env.CHANGELOG }}
           tag: ${{ env.TAG_NAME }}
+          token: ${{ secrets.GITHUB_RELEASE_TOKEN }}
