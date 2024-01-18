@@ -20,7 +20,9 @@ Please only add new entries below the [Unreleased](#unreleased---releasedate) he
 
 <!-- next-header -->
 
-## [@Unreleased](https://github.com/RibirX/rclog/compare/v0.1.2...HEAD) - @ReleaseDate
+## [@Unreleased] - @ReleaseDate
+
+## [0.1.3-alpha.1](https://github.com/RibirX/rclog/compare/v0.1.2...v0.1.3-alpha.1) - 2024-01-18
 
 ## [0.1.2](https://github.com/RibirX/rclog/compare/v0.1.1-alpha.1...v0.1.2) - 2024-01-08
 
@@ -31,6 +33,7 @@ Please only add new entries below the [Unreleased](#unreleased---releasedate) he
 ### Features
 
 <!-- next-url -->
+[@Unreleased]: https://github.com/RibirX/rclog/compare/v0.1.3-alpha.1...HEAD
 
 - support extract changelog from a specific version: `rclog -t 0.1.0 -p ./CHANGELOG.md extract`
 - support merge changelog from multi pre-release version to the more stable version: `rclog -t 0.1.0 -p ./CHANGELOG.md merge`
