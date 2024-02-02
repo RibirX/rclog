@@ -67,7 +67,7 @@ jobs:
           # todo: use cargo-release directly merge the changelog 
           # https://github.com/crate-ci/cargo-release/issues/741
           export MERGE_CHANGELOG=${{ inputs.merge_changelog }}
-          cargo release ${{inputs.level}} --execute --no-confirm
+          cargo release ${{inputs.level}} --execute --no-confirm --allow-dirty
       - name: Extract changelog
         run: |
           echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
