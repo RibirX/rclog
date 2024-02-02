@@ -63,7 +63,11 @@ jobs:
       - name: cargo login
         run: cargo login ${{ secrets.CRATE_RELEASE_TOKEN }}
       - name: Run cargo release to publish
-        run: cargo release ${{inputs.level}} --execute --no-confirm
+        run: |
+          # todo: use cargo-release directly merge the changelog 
+          # https://github.com/crate-ci/cargo-release/issues/741
+          export MERGE_CHANGELOG=${{ inputs.merge_changelog }}
+          cargo release ${{inputs.level}} --execute --no-confirm
       - name: Extract changelog
         run: |
           echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
