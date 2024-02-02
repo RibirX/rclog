@@ -1,6 +1,6 @@
 [package]
 name = "rclog"
-version = "0.1.3-alpha.1"
+version = "0.1.3"
 edition = "2021"
 license-file = "./LICENSE"
 description = "A tool that combines changelogs of pre-release versions into the more stable version and pulls out information for a specific version."
