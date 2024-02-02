@@ -34,7 +34,6 @@ permissions:
 
 env: 
   CARGO_TERM_COLOR: always
-  NEW_COMMIT_COUNT: 0
   CHANGELOG: 'Waiting to be extracted'
   TAG_NAME: 'Waiting to release'
   PRERELEASE: ${{ inputs.level == 'alpha' || inputs.level == 'beta' || inputs.level == 'rc' }}
@@ -47,36 +46,25 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
-          fetch-depth: 0 # Required to count the commits
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_RELEASE_TOKEN }}
-      - name: Get new commits
-        run: echo "NEW_COMMIT_COUNT=$(git log --oneline --since '1 week' | wc -l)" >> $GITHUB_ENV
       - name: Install Rust
-        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: ${{ inputs.toolchain }}
       - name: Install cargo-release & rclog
-        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-release, rclog
       - name: git config
-        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
         run: |
           git config --global user.name "RChangelog[bot]"
           git config --global user.email 155627257+RChangelog[bot]@users.noreply.github.com
       - name: cargo login
         run: cargo login ${{ secrets.CRATE_RELEASE_TOKEN }}
       - name: Run cargo release to publish
-        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
-        run: |
-          # todo: use cargo-release directly merge the changelog 
-          # https://github.com/crate-ci/cargo-release/issues/741
-          export MERGE_CHANGELOG=${{ inputs.merge_changelog }}
-          cargo release ${{inputs.level}} --execute --no-confirm
+        run: cargo release ${{inputs.level}} --execute --no-confirm
       - name: Extract changelog
-        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
         run: |
           echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
           version=$(git describe --tags --abbrev=0 | grep -oP '(?<=v)\S*')
@@ -87,7 +75,6 @@ jobs:
             echo 'delimiter-for-changelog'
           } >> $GITHUB_ENV
       - name: Github release notes
-        if: ${{ env.NEW_COMMIT_COUNT > 0 }}
         uses: ncipollo/release-action@v1
         with:
           prerelease: ${{ env.PRERELEASE }}
