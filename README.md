@@ -43,19 +43,3 @@ To publish a new version to crates.io you need to set your publish secret token 
 To push the release commit and tag to your repository, you need to set your deploy key in your repository. This action will use `${{ secrets.DEPLOY_KEY }}` to access the key.
 
 This workflow is based on [cargo-release](https://github.com/crate-ci/cargo-release) and `rclog`. 
-
-If you want to merge changelogs from all pre-release versions into the release version, you need to configure `pre-release-hook` for `cargo-release` in your project's `Cargo.toml` or `release.toml` with this content:
-
-```toml
-pre-release-hook = ["./rclog_hook.sh"]
-```
-
-And the `rclog_hook.sh` should be like this:
-
-```sh
-#!/bin/bash
-
-if [ "$MERGE_CHANGELOG" = true ]; then
-  echo "$(rclog -t $NEW_VERSION -p ./CHANGELOG.md merge)" >| ./CHANGELOG.md
-fi
-```

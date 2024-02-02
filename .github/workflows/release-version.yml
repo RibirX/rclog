@@ -64,20 +64,28 @@ jobs:
         run: cargo login ${{ secrets.CRATE_RELEASE_TOKEN }}
       - name: Run cargo release to publish
         run: |
-          # todo: use cargo-release directly merge the changelog 
-          # https://github.com/crate-ci/cargo-release/issues/741
-          export MERGE_CHANGELOG=${{ inputs.merge_changelog }}
-          cargo release ${{inputs.level}} --execute --no-confirm --allow-dirty
-      - name: Extract changelog
-        run: |
+          cargo release ${{inputs.level}} --execute --no-confirm --no-push
+
           echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
           version=$(git describe --tags --abbrev=0 | grep -oP '(?<=v)\S*')
+          
+          if [ "${{ inputs.merge_changelog }}" = true ]; then
+            echo "Replace changelog"
+            echo "$(rclog -t ${version} -p ./CHANGELOG.md merge)" >| ./CHANGELOG.md
+            git add CHANGELOG.md
+            git commit --amend --no-edit
+          fi
+
+          git push --follow-tags
+          
+          echo "Extract changelog..."
           echo "VERSION=$version" >> $GITHUB_ENV
           {
             echo 'CHANGELOG<<delimiter-for-changelog' 
             rclog -t ${version} -p ./CHANGELOG.md extract
             echo 'delimiter-for-changelog'
           } >> $GITHUB_ENV
+          
       - name: Github release notes
         uses: ncipollo/release-action@v1
         with:
