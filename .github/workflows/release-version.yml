@@ -34,7 +34,7 @@ permissions:
 
 env: 
   CARGO_TERM_COLOR: always
-  CHANGELOG: 'Waiting to be extracted'
+  CHANGELOG: ''
   TAG_NAME: 'Waiting to release'
   PRERELEASE: ${{ inputs.level == 'alpha' || inputs.level == 'beta' || inputs.level == 'rc' }}
 
@@ -77,16 +77,22 @@ jobs:
           fi
 
           git push --follow-tags
+          echo "VERSION=$version" >> $GITHUB_ENV
           
           echo "Extract changelog..."
-          echo "VERSION=$version" >> $GITHUB_ENV
-          {
-            echo 'CHANGELOG<<delimiter-for-changelog' 
-            rclog -t ${version} -p ./CHANGELOG.md extract
-            echo 'delimiter-for-changelog'
-          } >> $GITHUB_ENV
+          
+          changelog=$(rclog -t ${version} -p ./CHANGELOG.md extract || true)
+          if [ -z "${changelog}" ]; then
+            {
+              echo 'CHANGELOG<<delimiter-for-changelog' 
+              echo $changelog
+              echo 'delimiter-for-changelog'
+            } >> $GITHUB_ENV
+          fi
+          
           
       - name: Github release notes
+        if : ${{ env.CHANGELOG != ''  }}
         uses: ncipollo/release-action@v1
         with:
           prerelease: ${{ env.PRERELEASE }}
