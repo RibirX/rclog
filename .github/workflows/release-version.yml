@@ -82,7 +82,7 @@ jobs:
           echo "Extract changelog..."
           
           changelog=$(rclog -t ${version} -p ./CHANGELOG.md extract || true)
-          if [ -z "${changelog}" ]; then
+          if [ ! -z "${changelog}" ]; then
             {
               echo 'CHANGELOG<<delimiter-for-changelog' 
               echo $changelog
