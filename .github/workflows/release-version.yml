@@ -85,7 +85,7 @@ jobs:
           if [ ! -z "${changelog}" ]; then
             {
               echo 'CHANGELOG<<delimiter-for-changelog' 
-              echo $changelog
+              echo "$changelog"
               echo 'delimiter-for-changelog'
             } >> $GITHUB_ENV
           fi
