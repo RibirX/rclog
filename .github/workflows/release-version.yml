@@ -2,40 +2,40 @@ on:
   workflow_call:
     inputs:
       level:
-        description: 'The level of the release, see cargo-release doc for more info'
-        default: 'alpha'
+        description: "The level of the release, see cargo-release doc for more info"
+        default: "alpha"
         required: true
         type: string
       merge_changelog:
-        description: 'Merge the changelog into the release body'
+        description: "Merge the changelog into the release body"
         default: false
         required: false
         type: boolean
       toolchain:
-        description: 'The rust toolchain use to release the project'
-        default: 'stable'
+        description: "The rust toolchain use to release the project"
+        default: "stable"
         required: false
         type: string
       ref:
-        description: 'The ref to use to checkout the project'
-        default: '${{ github.ref }}'
+        description: "The ref to use to checkout the project"
+        default: "${{ github.ref }}"
         required: false
         type: string
     secrets:
       CRATE_RELEASE_TOKEN:
-        description: 'A token to publish the crate'
+        description: "A token to publish the crate"
         required: true
       GITHUB_RELEASE_TOKEN:
-        description: 'A github personal token to push release commit to the repo and create github release note'
+        description: "A github personal token to push release commit to the repo and create github release note"
         required: true
 
 permissions:
   contents: write
 
-env: 
+env:
   CARGO_TERM_COLOR: always
-  CHANGELOG: ''
-  TAG_NAME: 'Waiting to release'
+  CHANGELOG: ""
+  TAG_NAME: "Waiting to release"
   PRERELEASE: ${{ inputs.level == 'alpha' || inputs.level == 'beta' || inputs.level == 'rc' }}
 
 name: "Publish new version"
@@ -43,6 +43,10 @@ jobs:
   release:
     runs-on: ubuntu-22.04
     steps:
+      - name: Install development libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev pkg-config libwebp-dev
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
@@ -68,7 +72,7 @@ jobs:
 
           echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
           version=$(git describe --tags --abbrev=0 | grep -oP '(?<=v)\S*')
-          
+
           if [ "${{ inputs.merge_changelog }}" = true ]; then
             echo "Replace changelog"
             echo "$(rclog -t ${version} -p ./CHANGELOG.md merge)" >| ./CHANGELOG.md
@@ -78,9 +82,9 @@ jobs:
 
           git push --follow-tags
           echo "VERSION=$version" >> $GITHUB_ENV
-          
+
           echo "Extract changelog..."
-          
+
           changelog=$(rclog -t ${version} -p ./CHANGELOG.md extract || true)
           if [ ! -z "${changelog}" ]; then
             {
@@ -89,10 +93,9 @@ jobs:
               echo 'delimiter-for-changelog'
             } >> $GITHUB_ENV
           fi
-          
-          
+
       - name: Github release notes
-        if : ${{ env.CHANGELOG != ''  }}
+        if: ${{ env.CHANGELOG != ''  }}
         uses: ncipollo/release-action@v1
         with:
           prerelease: ${{ env.PRERELEASE }}
